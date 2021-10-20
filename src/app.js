@@ -1,4 +1,5 @@
-import { isValid } from '../utils'
+import { Question } from './question'
+import { isValid } from './utils'
 import './styles.css'
 
 const form = document.getElementById('form')
@@ -21,10 +22,11 @@ function submitFormHandler(event) {
 
     submitBtn.disabled = true
     // Async request to server to save question
-    console.log('Question', question)
-    input.value = ''
-    input.className = ''
-    submitBtn.disabled = false
-
+    Question.create(question).then(() => {
+      console.log('Question', question)
+      input.value = ''
+      input.className = ''
+      submitBtn.disabled = false
+    })
   }
 }
