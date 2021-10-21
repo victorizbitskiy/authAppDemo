@@ -1,12 +1,15 @@
 import { Question } from './question'
-import { isValid } from './utils'
+import { createModal, isValid } from './utils'
 import './styles.css'
+import { authWithEmailAndPasword, getAuthForm } from './auth'
 
 const form = document.getElementById('form')
+const modalBtn = document.getElementById('modal-btn')
 const input = form.querySelector('#question-input')
 const submitBtn = form.querySelector('#submit')
 
 form.addEventListener('submit', submitFormHandler)
+modalBtn.addEventListener('click', openModal)
 input.addEventListener('input', () => {
   submitBtn.disabled = !isValid(input.value)
 })
@@ -29,4 +32,29 @@ function submitFormHandler(event) {
       submitBtn.disabled = false
     })
   }
+}
+
+function openModal() {
+  createModal('Авторизация', getAuthForm())
+  document
+    .getElementById('auth-form')
+    .addEventListener('submit', authFormHandler, { once: true }) // чтобы событие было добавлено 1 раз
+}
+
+function authFormHandler(event) {
+  event.preventDefault()
+
+  const email = event.targer.querySelector('#email').value
+  const password = event.targer.querySelector('#password').value
+
+  authWithEmailAndPasword(email, password)
+    .then(token => {
+      return Question.fetch(token)
+    })
+    .then(renderModalAfterAuth)
+}
+
+function renderModalAfterAuth(content) {
+  console.log('Content', content)
+
 }
