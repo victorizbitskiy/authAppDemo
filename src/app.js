@@ -38,19 +38,17 @@ function openModal() {
   createModal('Авторизация', getAuthForm())
   document
     .getElementById('auth-form')
-    .addEventListener('submit', authFormHandler, { once: true }) // чтобы событие было добавлено 1 раз
+    .addEventListener('submit', authFormHandler) // чтобы событие было добавлено 1 раз
 }
 
 function authFormHandler(event) {
   event.preventDefault()
 
-  const email = event.targer.querySelector('#email').value
-  const password = event.targer.querySelector('#password').value
+  const email = event.target.querySelector('#email').value
+  const password = event.target.querySelector('#password').value
 
   authWithEmailAndPasword(email, password)
-    .then(token => {
-      return Question.fetch(token)
-    })
+    .then(Question.fetch)
     .then(renderModalAfterAuth)
 }
 

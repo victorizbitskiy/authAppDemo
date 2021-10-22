@@ -22,8 +22,8 @@ export class Question {
     }
     return fetch(`https://authappdemo-1bad6-default-rtdb.europe-west1.firebasedatabase.app/questions.json?auth=${token}`) // по умолчанию работает метод GET
       .then(response => response.json())
-      .then(questions => {
-        if (response.error) {
+      .then(response => {
+        if (response && resporse.error) {
           return `<p class="error">${response.error}</p>`
         }
 
