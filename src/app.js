@@ -1,13 +1,15 @@
-import { Question } from './question'
-import { createModal, isValid } from './utils'
+import {Question} from './question'
+import {createModal, isValid} from './utils'
+import {authWithEmailAndPassword, getAuthForm} from './auth'
 import './styles.css'
-import { authWithEmailAndPasword, getAuthForm } from './auth'
 
 const form = document.getElementById('form')
 const modalBtn = document.getElementById('modal-btn')
 const input = form.querySelector('#question-input')
 const submitBtn = form.querySelector('#submit')
 
+
+window.addEventListener('load', Question.renderList)
 form.addEventListener('submit', submitFormHandler)
 modalBtn.addEventListener('click', openModal)
 input.addEventListener('input', () => {
@@ -15,7 +17,7 @@ input.addEventListener('input', () => {
 })
 
 function submitFormHandler(event) {
-  event.preventDefault() // чтобы страница не перезагружалась
+  event.preventDefault()
 
   if (isValid(input.value)) {
     const question = {
@@ -26,7 +28,6 @@ function submitFormHandler(event) {
     submitBtn.disabled = true
     // Async request to server to save question
     Question.create(question).then(() => {
-      console.log('Question', question)
       input.value = ''
       input.className = ''
       submitBtn.disabled = false
@@ -38,21 +39,27 @@ function openModal() {
   createModal('Авторизация', getAuthForm())
   document
     .getElementById('auth-form')
-    .addEventListener('submit', authFormHandler) // чтобы событие было добавлено 1 раз
+    .addEventListener('submit', authFormHandler, {once: true})
 }
 
 function authFormHandler(event) {
   event.preventDefault()
 
+  const btn = event.target.querySelector('button')
   const email = event.target.querySelector('#email').value
   const password = event.target.querySelector('#password').value
 
-  authWithEmailAndPasword(email, password)
+  btn.disabled = true
+  authWithEmailAndPassword(email, password)
     .then(Question.fetch)
     .then(renderModalAfterAuth)
+    .then(() => btn.disabled = false)
 }
 
 function renderModalAfterAuth(content) {
-  console.log('Content', content)
-
+  if (typeof content === 'string') {
+    createModal('Ошибка!', content)
+  } else {
+    createModal('Список вопросов', Question.listToHTML(content))
+  }
 }
